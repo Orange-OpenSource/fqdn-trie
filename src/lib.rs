@@ -6,30 +6,11 @@ use fqdn::{FQDN,Fqdn};
 pub use set::FqdnTrieSet;
 pub use map::FqdnTrieMap;
 
-pub trait HasFqdn {
+/// Associate a FQDN to a structure.
+trait HasFqdn {
     /// Get the FQDN which is associated to this trait.
     fn fqdn(&self) -> &Fqdn;
 }
-
-impl HasFqdn for Fqdn {
-
-    #[inline]
-    fn fqdn(&self) -> &Fqdn { &self }
-}
-
-impl HasFqdn for FQDN {
-
-    #[inline]
-    fn fqdn(&self) -> &Fqdn { self.as_ref() }
-}
-
-impl HasFqdn for &FQDN {
-
-    #[inline]
-    fn fqdn(&self) -> &Fqdn { self.as_ref() }
-}
-
-
 
 // value of the _ depends if we apply the rfc strictly or not
 #[cfg(feature="domain-name-without-special-chars")] const __: u8 = 0;
@@ -40,8 +21,8 @@ impl HasFqdn for &FQDN {
 #[cfg(not(feature="domain-name-without-special-chars"))] pub(crate) const ALPHABET_SIZE: usize = 39; // we should also count the '_'
 
 // in order to decrease the necessary memory, this table reduces the search space only
-// to allowed chars in FQDN, i.e. a-zA-Z, 0-9 and -.
-// -> underscore is exceptionnally added since it often appears (control plane ?)
+// to allowed chars in FQDN, i.e. a-z, A-Z, 0-9 and -.
+// -> underscore is exceptionally added since it often appears (control plane ?)
 // all the others are treated equally (i.e. as a dot)
 // this is case insensitive (lower and upper case give the same index)
 

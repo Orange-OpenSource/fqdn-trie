@@ -53,19 +53,43 @@ impl<T: HasFqdn> InnerTrie<T> {
         }
     }
 
-    pub fn insert(&mut self, added: T) -> bool
+    pub fn replace(&mut self, mut value: T) -> Option<T>
     {
         debug_assert!(self.check_consistency());
 
-        let added_fqdn = added.fqdn();
+        let added_fqdn = value.fqdn();
 
         // search the insertion point
         let (mut b,l) = self.inner_lookup(added_fqdn);
 
         if added_fqdn.eq(self[l].fqdn()) {
             // okc this fqdn was already present
-            return false;
+            std::mem::swap(&mut value, &mut self[l]);
+            Some(value)
+        } else {
+            self.real_insert(value, b, l);
+            None
         }
+    }
+
+    pub fn insert(&mut self, added: T) -> bool
+    {
+        debug_assert!(self.check_consistency());
+
+        // search the insertion point
+        let (mut b, l) = self.inner_lookup(added.fqdn());
+
+        if added.fqdn().eq(self[l].fqdn()) {
+            false
+        } else {
+            self.real_insert(added, b, l);
+            true
+        }
+    }
+
+    fn real_insert(&mut self, added: T, mut b: BranchingIndex, l: LeafIndex)
+    {
+        let added_fqdn = added.fqdn();
 
         let added_leaf: LeafIndex = self.leaf.len().into();
 
@@ -125,7 +149,6 @@ impl<T: HasFqdn> InnerTrie<T> {
             mem::swap(&mut self.leaf, &mut leaves);
         }
         self.leaf.push(added);
-        true
     }
 
 
