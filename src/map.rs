@@ -4,26 +4,47 @@ use std::ops::{Index, IndexMut};
 use crate::{HasFqdn, FQDN, Fqdn};
 use crate::trie::InnerTrie;
 
-impl<T> HasFqdn for (FQDN,T) {
-    fn fqdn(&self) -> &Fqdn { &self.0 }
+impl<K:AsRef<Fqdn>,T> HasFqdn for (K,T) {
+    fn fqdn(&self) -> &Fqdn { self.0.as_ref() }
 }
 
-pub struct FqdnTrieMap<T> {
-    inner: InnerTrie<(FQDN,T)>
+pub struct FqdnTrieMap<K:AsRef<Fqdn>,T> {
+    inner: InnerTrie<(K,T)>
 }
 
-impl<T> FqdnTrieMap<T> {
+impl<K:AsRef<Fqdn>,T> FqdnTrieMap<K,T> {
 
     #[inline]
     pub fn new(root: T) -> Self
+        where K:Default
     {
-        Self { inner: InnerTrie::new((FQDN::default(), root)) }
+        let fqdn = K::default();
+        assert_eq!( *fqdn.as_ref(), FQDN::default());
+        Self { inner: InnerTrie::new((fqdn, root)) }
+    }
+
+    #[inline]
+    pub fn with_key_root(key: K, root: T) -> Self
+    {
+        assert_eq!( *key.as_ref(), FQDN::default());
+        Self { inner: InnerTrie::new((key, root)) }
     }
 
     #[inline]
     pub fn with_capacity(root: T, capacity: usize) -> Self
+        where K:Default
     {
-        Self { inner: InnerTrie::with_capacity((FQDN::default(), root), capacity) }
+        let fqdn = K::default();
+        assert_eq!( *fqdn.as_ref(), FQDN::default());
+        Self { inner: InnerTrie::with_capacity((fqdn, root), capacity) }
+    }
+
+    #[inline]
+    pub fn with_key_root_and_capacity(key: K, root: T, capacity: usize) -> Self
+        where K:Default
+    {
+        assert_eq!( *key.as_ref(), FQDN::default());
+        Self { inner: InnerTrie::with_capacity((key, root), capacity) }
     }
 
     #[inline]
@@ -39,51 +60,50 @@ impl<T> FqdnTrieMap<T> {
     }
 
     #[inline]
-    pub fn get<K:AsRef<Fqdn>>(&self, look: K) -> Option<&T>
+    pub fn get<Q:AsRef<Fqdn>>(&self, look: Q) -> Option<&T>
     {
         self.inner.get_exact_leaf(look.as_ref()).map(|(_,l)| l)
     }
 
     #[inline]
-    pub fn get_key_value<K:AsRef<Fqdn>>(&self, look: K) -> Option<(&Fqdn,&T)>
+    pub fn get_key_value<Q:AsRef<Fqdn>>(&self, look: Q) -> Option<(&K,&T)>
     {
-        self.inner.get_exact_leaf(look.as_ref())
-            .map(|(f,v)| (f.as_ref(), v))
+        self.inner.get_exact_leaf(look.as_ref()).map(|(f,v)| (f, v))
     }
 
     #[inline]
-    pub fn get_mut<K:AsRef<Fqdn>>(&mut self, look: K) -> Option<&mut T>
+    pub fn get_mut<Q:AsRef<Fqdn>>(&mut self, look: Q) -> Option<&mut T>
     {
         self.inner.get_exact_leaf_mut(look.as_ref()).map(|(_,l)| l)
     }
 
     #[inline]
-    pub fn lookup<K:AsRef<Fqdn>>(&self, look: K) -> &T
+    pub fn lookup<Q:AsRef<Fqdn>>(&self, look: Q) -> &T
     {
         &self.inner.lookup(look.as_ref()).1
     }
 
     #[inline]
-    pub fn lookup_key_value<K:AsRef<Fqdn>>(&self, look: K) -> (&Fqdn,&T)
+    pub fn lookup_key_value<Q:AsRef<Fqdn>>(&self, look: Q) -> (&K,&T)
     {
         let (f,v) = self.inner.lookup(look.as_ref());
-        (f.as_ref(), v)
+        (f, v)
     }
 
     #[inline]
-    pub fn lookup_mut<K:AsRef<Fqdn>>(&mut self, look: K) -> &mut T
+    pub fn lookup_mut<Q:AsRef<Fqdn>>(&mut self, look: Q) -> &mut T
     {
         &mut self.inner.lookup_mut(look.as_ref()).1
     }
 
     #[inline]
-    pub fn insert(&mut self, fqdn:FQDN, added: T) -> bool
+    pub fn insert(&mut self, fqdn:K, added: T) -> bool
     {
         self.inner.insert((fqdn,added))
     }
 
     #[inline]
-    pub fn remove<K:AsRef<Fqdn>>(&mut self, removed: K) -> Option<(FQDN,T)>
+    pub fn remove<Q:AsRef<Fqdn>>(&mut self, removed: Q) -> Option<(K,T)>
     {
         self.inner.remove(removed.as_ref())
     }
@@ -105,19 +125,18 @@ impl<T> FqdnTrieMap<T> {
     pub fn len(&self) -> usize { self.inner.len() }
 }
 
-impl<T> Extend<(FQDN,T)> for FqdnTrieMap<T>
+impl<K:AsRef<Fqdn>,T> Extend<(K,T)> for FqdnTrieMap<K,T>
 {
-    fn extend<I: IntoIterator<Item=(FQDN, T)>>(&mut self, iter: I)
+    fn extend<I: IntoIterator<Item=(K,T)>>(&mut self, iter: I)
     {
-        iter.into_iter()
-            .for_each(| (key,val) | { self.insert(key, val); } )
+        iter.into_iter().for_each(| (key,val) | { self.insert(key, val); } )
     }
 }
 
 
-impl<T:Default> FromIterator<(FQDN,T)> for FqdnTrieMap<T>
+impl<K:AsRef<Fqdn>+Default,T:Default> FromIterator<(K,T)> for FqdnTrieMap<K,T>
 {
-    fn from_iter<I:IntoIterator<Item=(FQDN,T)>>(iter: I) -> Self
+    fn from_iter<I:IntoIterator<Item=(K,T)>>(iter: I) -> Self
     {
         let mut triemap = Self::new(T::default());
         triemap.extend(iter);
@@ -126,7 +145,7 @@ impl<T:Default> FromIterator<(FQDN,T)> for FqdnTrieMap<T>
 }
 
 
-impl<I:AsRef<Fqdn>,T:AsRef<Fqdn>> Index<I> for FqdnTrieMap<T>
+impl<I:AsRef<Fqdn>,K:AsRef<Fqdn>,T> Index<I> for FqdnTrieMap<K,T>
 {
     type Output = T;
     #[inline]
@@ -135,7 +154,7 @@ impl<I:AsRef<Fqdn>,T:AsRef<Fqdn>> Index<I> for FqdnTrieMap<T>
     }
 }
 
-impl<I:AsRef<Fqdn>,T:AsRef<Fqdn>> IndexMut<I> for FqdnTrieMap<T>
+impl<I:AsRef<Fqdn>,K:AsRef<Fqdn>,T> IndexMut<I> for FqdnTrieMap<K,T>
 {
     fn index_mut(&mut self, index: I) -> &mut Self::Output {
         self.lookup_mut(index)

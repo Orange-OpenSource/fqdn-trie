@@ -60,7 +60,7 @@ impl<T: HasFqdn> InnerTrie<T> {
         let added_fqdn = value.fqdn();
 
         // search the insertion point
-        let (mut b,l) = self.inner_lookup(added_fqdn);
+        let (b,l) = self.inner_lookup(added_fqdn);
 
         if added_fqdn.eq(self[l].fqdn()) {
             // okc this fqdn was already present
@@ -77,7 +77,7 @@ impl<T: HasFqdn> InnerTrie<T> {
         debug_assert!(self.check_consistency());
 
         // search the insertion point
-        let (mut b, l) = self.inner_lookup(added.fqdn());
+        let (b, l) = self.inner_lookup(added.fqdn());
 
         if added.fqdn().eq(self[l].fqdn()) {
             false
