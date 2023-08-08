@@ -30,7 +30,8 @@ impl<T:AsRef<Fqdn>> FqdnTrieSet<T> {
     /// Creates a new set with the root element and an initial capacity.
     ///
     /// # Panics
-    /// Panics if the FQDN of the root element is not the empty one (`.`)#[inline]
+    /// Panics if the FQDN of the root element is not the empty one (`.`)
+    #[inline]
     pub fn with_capacity(root: T, capacity: usize) -> Self
     {
         Self { inner: InnerTrie::with_capacity(TrieSetElt(root), capacity) }
