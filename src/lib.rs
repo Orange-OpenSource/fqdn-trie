@@ -1,3 +1,11 @@
+//! This crate provides two data structures based on FQDN tries in order
+//! to provide very fast lookup in the FQDN hierarchy.
+//!
+//! The trie implementation is optimized to FQDN context and follows these rules:
+//! * the search algorithm finds the longuest domain suffix
+//! * the algorithm is case-insensitive
+//! * the internal structure exploits the range of allowed characters in FQDN
+
 mod trie;
 mod set;
 mod map;
