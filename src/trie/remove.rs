@@ -1,6 +1,5 @@
 use crate::trie::InnerTrie;
-use crate::{Fqdn, FQDN};
-use crate::{HasFqdn, ALPHABET_SIZE};
+use crate::{Fqdn, ALPHABET_SIZE, FQDN, HasFqdn};
 use crate::trie::index::{BranchingIndex, LeafIndex};
 
 impl<T: HasFqdn> InnerTrie<T> {

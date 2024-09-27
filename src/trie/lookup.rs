@@ -66,10 +66,6 @@ impl<T: HasFqdn> InnerTrie<T> {
     {
         // todo: improve that (lookup could be shorten)
         let (_,l) = self.inner_lookup(f);
-        if self[l].fqdn().eq(f) {
-            Some(l)
-        } else {
-            None
-        }
+        self[l].fqdn().eq(f).then_some(l)
     }
 }
