@@ -14,9 +14,11 @@
 
 // value of the _ depends if we apply the rfc strictly or not
 #[cfg(feature="domain-name-without-special-chars")] const UNDER: (u8,u8) = (0,0);
+#[cfg(feature="domain-name-without-special-chars")] const HASH: (u8,u8) = (0,0);
 #[cfg(not(feature="domain-name-without-special-chars"))] const UNDER: (u8,u8) = (1,2);
+#[cfg(not(feature="domain-name-without-special-chars"))] const HASH: (u8,u8) = (1,3);
 
-// if more special chars are needed, the remaining available codes are: (1,3), (1,4), (1,5), (1,6)
+// if more special chars are needed, the remaining available codes are: (1,4), (1,5), (1,6)
 // (this should be have a negligible impact on the memory use and on performances)
 
 // if it is not enough, then the code (0,1) to (0,6) could be used
@@ -25,7 +27,7 @@
 const MAPPING: [(u8,u8);256] = [
     (0,0), (0,0), (0,0), (0,0), (0,0), (0,0), (0,0), (0,0),     (0,0), (0,0), (0,0), (0,0), (0,0), (0,0), (0,0), (0,0),
     (0,0), (0,0), (0,0), (0,0), (0,0), (0,0), (0,0), (0,0),     (0,0), (0,0), (0,0), (0,0), (0,0), (0,0), (0,0), (0,0),
-    (0,0), (0,0), (0,0), (0,0), (0,0), (0,0), (0,0), (0,0),     (0,0), (0,0), (0,0), (0,0), (0,0), (3,3), (0,0), (0,0), // '-' (dash)
+    (0,0), (0,0), (0,0),  HASH, (0,0), (0,0), (0,0), (0,0),     (0,0), (0,0), (0,0), (0,0), (0,0), (3,3), (0,0), (0,0), // '-' (dash)
     (3,5), (3,4), (3,6), (2,1), (2,3), (2,4), (2,5), (2,2),     (1,1), (2,6), (0,0), (0,0), (0,0), (0,0), (0,0), (0,0), // 0-9
     (0,0), (6,3), (5,4), (2,0), (6,5), (6,2), (4,1), (5,3),     (5,6), (6,1), (4,6), (4,0), (5,5), (5,0), (6,0), (1,0), // A-O
     (5,2), (3,1), (6,6), (5,1), (6,4), (3,0), (4,2), (4,4),     (4,5), (4,3), (3,2), (0,0), (0,0), (0,0), (0,0), UNDER, // P-Z and '_' (underscore)
