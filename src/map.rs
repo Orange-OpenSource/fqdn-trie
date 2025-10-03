@@ -137,6 +137,11 @@ impl<K:AsRef<Fqdn>,T> FqdnTrieMap<K,T> {
         self.inner.get_exact_leaf_mut(look.as_ref()).map(|(_,l)| l)
     }
 
+    #[inline]
+    pub fn iter(&self) -> impl Iterator<Item=&(K,T)> {
+        self.inner.iter()
+    }
+
     /// Gets the element which the longuest parent domain of the given FQDN.
     ///
     /// To use an exact match, consider [`Self::get`]

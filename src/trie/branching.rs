@@ -37,12 +37,12 @@ impl Branching {
 
     #[inline]
     pub(crate) fn child_from_letter(&self, bytes: &Fqdn) -> NodeIndex {
-        self.child_from_index(self.pos.get(bytes) as usize)
+        self.child_from_index(self.pos.get(bytes))
     }
 
     #[inline]
     pub(crate) fn child_from_letter_mut(&mut self, bytes: &Fqdn) -> &mut NodeIndex {
-        self.child_from_index_mut(self.pos.get(bytes) as usize)
+        self.child_from_index_mut(self.pos.get(bytes))
     }
 
     #[inline]

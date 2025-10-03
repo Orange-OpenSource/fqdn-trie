@@ -120,7 +120,7 @@ impl<T: HasFqdn> InnerTrie<T> {
                     self.replace_escape_leaf(b, self[b].escape, added_leaf);
                 } else {
                     let x = self[b].child_from_letter(derived);
-                    self.insert_suffix_branching(b, added_leaf, x, p.into(), derived);
+                    self.insert_suffix_branching(b, added_leaf, x, p, derived);
                 }
             } else {
                 // case of a new concurrent FQDN

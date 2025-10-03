@@ -101,6 +101,12 @@ impl<T:AsRef<Fqdn>> FqdnTrieSet<T> {
         self.inner.get_exact_leaf(look.as_ref()).map(|x| &x.0)
     }
 
+    /// Gets an iterator over all the stored FQDN
+    pub fn iter(&self) -> impl Iterator<Item=&T>
+    {
+        self.inner.iter().map(|x| &x.0)
+    }
+
     /// Gets the element which the longuest parent domain of the given FQDN.
     ///
     /// To use an exact match, consider [`Self::get`]

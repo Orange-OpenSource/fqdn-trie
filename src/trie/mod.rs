@@ -47,6 +47,12 @@ impl<T:HasFqdn> InnerTrie<T> {
         self.leaf.len()
     }
 
+    #[inline]
+    pub(crate) fn iter(&self) -> impl Iterator<Item=&T>
+    {
+        self.leaf.iter()
+    }
+
     pub(crate) fn with_capacity(root: T, capacity: usize) -> Self
     {
         assert!( root.fqdn().is_root(), "the root data should be associated with the root (empty) FQDN" );
@@ -166,3 +172,4 @@ impl<T:HasFqdn> IndexMut<LeafIndex> for InnerTrie<T>
         unsafe { self.leaf.get_unchecked_mut(i.index())}
     }
 }
+
